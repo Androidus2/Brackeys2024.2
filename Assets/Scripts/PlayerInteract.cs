@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerInteract : MonoBehaviour
 {
+    [SerializeField]
+    private GameObject instructionObject;
 
     [SerializeField]
     private Material beam;
@@ -39,6 +41,9 @@ public class PlayerInteract : MonoBehaviour
             if (interactiblesInRange.Count > 0)
             {
                 state = 1;
+
+                if(instructionObject)
+                    instructionObject.SetActive(false);
             }
         }
         else if (state == 1)
@@ -64,6 +69,9 @@ public class PlayerInteract : MonoBehaviour
             {
                 progress = 0;
                 state = 0;
+
+                if(instructionObject && interactiblesInRange.Count > 0)
+                    instructionObject.SetActive(true);
             }
             beam.SetFloat(nameID, progress);
         }
@@ -101,6 +109,11 @@ public class PlayerInteract : MonoBehaviour
             {
                 Debug.LogError("Interactable component not found on object: " + other.name);
             }
+
+            if (instructionObject && interactiblesInRange.Count > 0 && state == 0)
+            {
+                instructionObject.SetActive(true);
+            }
         }
     }
 
@@ -117,6 +130,11 @@ public class PlayerInteract : MonoBehaviour
             else
             {
                 Debug.LogError("Interactable component not found on object: " + other.name);
+            }
+
+            if (instructionObject && interactiblesInRange.Count == 0)
+            {
+                instructionObject.SetActive(false);
             }
         }
     }
