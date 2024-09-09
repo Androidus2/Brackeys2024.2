@@ -27,6 +27,12 @@ public class PlayerInteract : MonoBehaviour
     [SerializeField]
     private SphereCollider objectHolder;
 
+    [SerializeField]
+    private AudioSource beamDown;
+
+    [SerializeField]
+    private AudioSource beamUp;
+
     private int state = 0; // 0 - off, 1 - turning on, 2 - turning off, 3 - on
     private List<Interactable> interactiblesInRange = new List<Interactable>();
 
@@ -55,6 +61,8 @@ public class PlayerInteract : MonoBehaviour
 
                 if(instructionObject)
                     instructionObject.SetActive(false);
+
+                beamDown.Play();
             }
         }
         else if (state == 1)
@@ -76,6 +84,7 @@ public class PlayerInteract : MonoBehaviour
                         }
                     }
                 }
+                beamUp.Play();
             }
             beam.SetFloat(nameID, progress);
         }
@@ -121,9 +130,10 @@ public class PlayerInteract : MonoBehaviour
 
     private void RemoveInteractedObject(Interactable interact)
     {
+        if(interact)
+            MakeDummyObject(interact.GetDummyPrefab());
         if (interact && interactiblesInRange.Contains(interact))
         {
-            MakeDummyObject(interact.GetDummyPrefab());
             interactiblesInRange.Remove(interact);
         }
 
