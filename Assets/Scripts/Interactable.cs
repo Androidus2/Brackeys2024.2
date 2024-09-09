@@ -10,7 +10,13 @@ public class Interactable : MonoBehaviour
     private Material material;
 
     [SerializeField]
-    private float dissolveSpeed = 2.0f;
+    private float dissolveSpeed = 1.0f;
+
+    [SerializeField]
+    private int weight = 1;
+
+    [SerializeField]
+    private Transform dummyPrefab;
 
     private int state = 0; // 0 - on, 1 - turning off, 2 - off
     private int nameID;
@@ -64,6 +70,16 @@ public class Interactable : MonoBehaviour
             material.SetFloat(nameID, progress);
             GetComponent<Renderer>().material = material;
         }
+    }
+
+    public int GetWeight()
+    {
+        return weight;
+    }
+
+    public Transform GetDummyPrefab()
+    {
+        return dummyPrefab;
     }
 
 }
