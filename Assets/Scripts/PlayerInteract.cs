@@ -36,6 +36,9 @@ public class PlayerInteract : MonoBehaviour
     private int state = 0; // 0 - off, 1 - turning on, 2 - turning off, 3 - on
     private List<Interactable> interactiblesInRange = new List<Interactable>();
 
+    private bool bunkerInRange = false;
+    private List<Dummy> dummies = new List<Dummy>();
+
     private int nameID;
     private float progress = 0;
     private float onTimer = 0;
@@ -55,7 +58,7 @@ public class PlayerInteract : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E) && state == 0)
         {
-            if (interactiblesInRange.Count > 0)
+            if (interactiblesInRange.Count > 0 || bunkerInRange)
             {
                 state = 1;
 
@@ -84,6 +87,15 @@ public class PlayerInteract : MonoBehaviour
                         }
                     }
                 }
+
+                if (bunkerInRange)
+                {
+                    GameMaster.TotalScrap += currentWeight;
+                    currentWeight = 0;
+                    weightText.text = currentWeight + " / " + maxWeight;
+                    ReleaseDummies();
+                }
+
                 beamUp.Play();
             }
             beam.SetFloat(nameID, progress);
@@ -110,7 +122,7 @@ public class PlayerInteract : MonoBehaviour
                     }
                 }
 
-                if(instructionObject && interactiblesInRange.Count > 0 && ok)
+                if(instructionObject && ((interactiblesInRange.Count > 0 && ok) || (bunkerInRange && currentWeight > 0)))
                     instructionObject.SetActive(true);
 
                 weightText.text = currentWeight + " / " + maxWeight;
@@ -131,7 +143,7 @@ public class PlayerInteract : MonoBehaviour
     private void RemoveInteractedObject(Interactable interact)
     {
         if(interact)
-            MakeDummyObject(interact.GetDummyPrefab());
+            MakeDummyObject(interact.GetDummyPrefab(), interact.transform.localScale);
         if (interact && interactiblesInRange.Contains(interact))
         {
             interactiblesInRange.Remove(interact);
@@ -141,7 +153,7 @@ public class PlayerInteract : MonoBehaviour
         interactiblesInRange.RemoveAll(item => item == null);
     }
 
-    private void MakeDummyObject(Transform obj)
+    private void MakeDummyObject(Transform obj, Vector3 originalSize)
     {
         if (obj)
         {
@@ -156,7 +168,31 @@ public class PlayerInteract : MonoBehaviour
             dummy.localPosition = new Vector3(Random.Range(-objectHolder.radius, objectHolder.radius), Random.Range(0, objectHolder.radius), Random.Range(-objectHolder.radius, objectHolder.radius));
             if(dummy.localPosition.magnitude > objectHolder.radius)
                 dummy.localPosition = dummy.localPosition.normalized * Random.Range(0, objectHolder.radius);
+
+            Dummy dummyScript = dummy.GetComponent<Dummy>();
+            dummyScript.SetOriginalSize(originalSize);
+
+            if (dummyScript)
+            {
+                dummies.Add(dummyScript);
+            }
+            else
+            {
+                Debug.LogError("Dummy component not found on object: " + obj.name);
+            }
         }
+    }
+
+    private void ReleaseDummies()
+    {
+        foreach (Dummy dummy in dummies)
+        {
+            if (dummy)
+            {
+                dummy.Release();
+            }
+        }
+        dummies.Clear();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -179,7 +215,15 @@ public class PlayerInteract : MonoBehaviour
                 Debug.LogError("Interactable component not found on object: " + other.name);
             }
 
-            if (instructionObject && interactiblesInRange.Count > 0 && state == 0)
+            if (instructionObject && (interactiblesInRange.Count > 0 || (bunkerInRange && currentWeight > 0)) && state == 0)
+            {
+                instructionObject.SetActive(true);
+            }
+        }
+        else if (other.CompareTag("Bunker"))
+        {
+            bunkerInRange = true;
+            if (instructionObject && (interactiblesInRange.Count > 0 || (bunkerInRange && currentWeight > 0)) && state == 0)
             {
                 instructionObject.SetActive(true);
             }
@@ -201,7 +245,15 @@ public class PlayerInteract : MonoBehaviour
                 Debug.LogError("Interactable component not found on object: " + other.name);
             }
 
-            if (instructionObject && interactiblesInRange.Count == 0)
+            if (instructionObject && interactiblesInRange.Count == 0 && !bunkerInRange)
+            {
+                instructionObject.SetActive(false);
+            }
+        }
+        else if (other.CompareTag("Bunker"))
+        {
+            bunkerInRange = false;
+            if (instructionObject && interactiblesInRange.Count == 0 && !bunkerInRange)
             {
                 instructionObject.SetActive(false);
             }

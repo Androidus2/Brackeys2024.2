@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Dummy : MonoBehaviour
 {
+    private Vector3 originalSize;
 
     [SerializeField]
     private Material currentMaterial;
@@ -41,6 +43,18 @@ public class Dummy : MonoBehaviour
 
     private void UpdateMaterial()
     {
+        if(state == 0)
+        {
+            progress -= Time.deltaTime * speedMultiplier;
+            currentMaterial.SetFloat(nameID, progress);
+
+            if (progress <= 0f)
+            {
+                progress = 0;
+                state = 5;
+                GetComponent<MeshRenderer>().material = finishedMaterial;
+            }
+        }
         if(state == 1)
         {
             progress -= Time.deltaTime * speedMultiplier;
@@ -48,8 +62,23 @@ public class Dummy : MonoBehaviour
 
             if(progress <= 0f)
             {
+                progress = 0;
                 state = 3;
                 GetComponent<MeshRenderer>().material = finishedMaterial;
+            }
+        }
+        else if(state == 2)
+        {
+            progress += Time.deltaTime * speedMultiplier;
+            currentMaterial.SetFloat(nameID, progress);
+
+            if(progress >= 1f)
+            {
+                state = 0;
+                progress = 1;
+                transform.parent = null;
+                GetComponent<Rigidbody>().isKinematic = false;
+                transform.localScale = originalSize;
             }
         }
         else if(state == 3)
@@ -72,6 +101,23 @@ public class Dummy : MonoBehaviour
                 state = 3;
             }
         }
+        else if(state == 5)
+        {
+            progress += Time.deltaTime * speedMultiplier;
+            if (progress >= 3f)
+                Destroy(gameObject);
+        }
+    }
+
+    public void SetOriginalSize(Vector3 size)
+    {
+        originalSize = size;
+    }
+
+    public void Release()
+    {
+        state = 2;
+        GetComponent<MeshRenderer>().material = currentMaterial;
     }
 
 }
