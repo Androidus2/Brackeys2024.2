@@ -3,7 +3,22 @@ guid: 5a315b17ebf7c1a4284a8e1663fe54d0
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Grill
+    second: {fileID: 2100000, guid: 17e2d54dd525e35449131aca63411a95, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Metal
+    second: {fileID: 2100000, guid: 6ce82139c151fdb42bddca69e24c17f6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Seats
+    second: {fileID: 2100000, guid: 428a538d1479e5e4dae7f0997a6c4b96, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
