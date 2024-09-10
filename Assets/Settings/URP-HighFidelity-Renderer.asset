@@ -53,7 +53,8 @@ MonoBehaviour:
     hdrDebugViewPS: {fileID: 4800000, guid: 573620ae32aec764abd4d728906d2587, type: 3}
   m_RendererFeatures:
   - {fileID: -1878332245247344467}
-  m_RendererFeatureMap: adc0de57c6d2eee5
+  - {fileID: 2638196064606192000}
+  m_RendererFeatureMap: adc0de57c6d2eee58081afce57c19c24
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -96,3 +97,47 @@ MonoBehaviour:
   m_CopyDepthMode: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
+--- !u!114 &2638196064606192000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 241458863f252dc4298c5eea13ee4e34, type: 3}
+  m_Name: Volumetric Clouds
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  settings:
+    material: {fileID: 2100000, guid: 1c761ab387349d6499f982d3cc44b2e1, type: 2}
+    renderPassEvent: 400
+    color: {r: 0.016913068, g: 0.014551446, b: 0.028301895, a: 1}
+    alpha: 1
+    BoundsMin: {x: -250, y: 50, z: -250}
+    BoundsMax: {x: 250, y: 80, z: 250}
+    RenderDistance: 1000
+  cloudSettings:
+    Steps: 15
+    LightSteps: 10
+    CloudNoiseTexure: {fileID: 2800000, guid: 057ca1a1caeb0ce4f8b0c62984e1a0e0, type: 3}
+    CloudScale: 1
+    CloudSmooth: 5
+    Wind: {x: 0.04, y: 0, z: 0}
+    LightAbsorptionThroughCloud: 0.15
+    PhaseParams: {x: 0.1, y: 0.25, z: 0.5, w: 0}
+    ContainerEdgeFadeDst: 45
+    DensityThreshold: 0.2
+    DensityMultiplier: 5
+    LightAbsorptionTowardSun: 0.25
+    DarknessThreshold: 0.2
+  detailCloudSettings:
+    detailCloudWeight: 0.24
+    DetailCloudNoiseTexure: {fileID: 11700000, guid: 9daca019d144ff34292e4ce0658dbeed,
+      type: 2}
+    DetailCloudScale: 1
+    DetailCloudWind: {x: 0.02, y: 0, z: 0}
+  blueNoiseSettings:
+    BlueNoiseTexure: {fileID: 0}
+    RayOffsetStrength: 50
