@@ -26,8 +26,12 @@ public class Interactable : MonoBehaviour
     // Remember the callback
     private Action<Interactable> callback;
 
-    private void Start()
+    private Outline outline;
+
+    private void Awake()
     {
+        outline = GetComponent<Outline>();
+        outline.enabled = false;
         nameID = Shader.PropertyToID("_Progress");
         material.SetFloat(nameID, progress);
     }
@@ -69,6 +73,7 @@ public class Interactable : MonoBehaviour
             // Set the material
             material.SetFloat(nameID, progress);
             GetComponent<Renderer>().material = material;
+            outline.enabled = false;
         }
     }
 
@@ -80,6 +85,11 @@ public class Interactable : MonoBehaviour
     public Transform GetDummyPrefab()
     {
         return dummyPrefab;
+    }
+
+    public void SetOutline(bool value)
+    {
+        outline.enabled = value;
     }
 
 }

@@ -6,7 +6,7 @@ public class GameMaster : MonoBehaviour
 {
 
     private static int totalScrap = 0;
-    private static int totalTime = 30;
+    private static int totalTime = 120;
 
     private static GameMaster instance;
 
