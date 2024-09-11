@@ -8,6 +8,9 @@ public class PlayerMovement : MonoBehaviour
     private float speed = 5.0f;
 
     [SerializeField]
+    private Transform cam;
+
+    [SerializeField]
     private Transform playerModel;
 
     [SerializeField]
@@ -28,6 +31,10 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+
+        //Lock the cursor to the center of the screen
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void Update()
@@ -41,14 +48,15 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         // Move the player using add force, so it has a floaty feel as it is a UFO
-        rb.AddForce(new Vector3(movement.x, 0, movement.y) * speed);
+        Vector3 forceVector = movement.y * cam.forward + movement.x * cam.right;
+        rb.AddForce(forceVector * speed);
 
         // Tilt the player in the direction it is moving
         //playerModel.localRotation = Quaternion.Euler(movement.y * tiltAmount, 0, -movement.x * tiltAmount);
         // use the velocity of the rigidbody to determine the tilt
         playerModel.localRotation = Quaternion.Euler(rb.velocity.z * tiltAmount, 0, -rb.velocity.x * tiltAmount);
 
-        // If it is spinning on the X or Z axis, add torque to cancel it
+        /*// If it is spinning on the X or Z axis, add torque to cancel it
         if (Mathf.Abs(rb.angularVelocity.x) > 0.1f)
         {
             rb.AddTorque(Vector3.right * -rb.angularVelocity.x);
@@ -56,7 +64,10 @@ public class PlayerMovement : MonoBehaviour
         if (Mathf.Abs(rb.angularVelocity.z) > 0.1f)
         {
             rb.AddTorque(Vector3.forward * -rb.angularVelocity.z);
-        }
+        }*/
+
+        // Always keep the X and Z rotation at 0
+        rb.rotation = Quaternion.Euler(0, rb.rotation.eulerAngles.y, 0);
     }
 
     private void ApplySounds()

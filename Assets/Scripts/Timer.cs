@@ -27,4 +27,9 @@ public class Timer : MonoBehaviour
         }
     }
 
+    public void RemoveTime(float time)
+    {
+        timeLeft -= time;
+    }
+
 }
