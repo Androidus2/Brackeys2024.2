@@ -1,0 +1,19 @@
+Greetings human! I am the Crazy Apocalyptic Levitation Machine, aka C.A.L.M. You have been selected as the new pilot for exploration missions in the radioactive storm that has wiped out most of the Earth.
+Your job is simple. You get to pilot me in the wasteland in order to collect scrap. The scrap is used for upgrades.
+This is the lab. Here you can move around upgrade me anytime before going in the storm.
+Looks like we are in a severe lack of resources, how about a test run?
+--test run--
+Welcome to the wasteland! Most cities are long gone but there is plenty of scrap for us to collect. The scanner is detecting and highlighting all nearby objects.
+Just go over an object and press E in order to collect it.
+Goodjob! However there is limited storage onboard so we need to go back to base to drop the scrap collected before heading further into the storm.
+Go to the entrance of the base and press E to deposit all the scrap in the storage.
+Easy right? Well you should know that even C.A.L.M. units take damage from the storm. You can see the current health on your screen. The radioactive storm slowly drains it all away.
+When the health is up all scrap on board is lost and we immediatley return to base. Colliding with objects or getting hit by storm creatures drains health as well.
+That's about it! Keep calm and keep C.A.L.M. safe in the storm!
+--
+
+Upgrade completed!
+30 seconds left!
+The storm is causing too much damage. Returning to base!
+Not enough storage!
+Collision detected!
