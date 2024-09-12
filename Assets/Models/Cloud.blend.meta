@@ -7,6 +7,11 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Cloud
+    second: {fileID: 2100000, guid: 9e73da9979f0d1a44a8ca0ae3c74db42, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Eye
     second: {fileID: 2100000, guid: 85cfae165d4a03f4798da94ffea74264, type: 2}
   - first:
