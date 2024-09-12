@@ -35,10 +35,11 @@ public class ScrapSpawner : MonoBehaviour
         {
             Ray ray = new Ray(spawnPoint, Vector3.down);
             RaycastHit hit;
+            Vector3 potentialValidPoint;
 
-            if(Physics.Raycast(ray, out hit))
+            if(Physics.Raycast(ray, out hit) && checkAboveSpawnPoint(spawnPoint, out potentialValidPoint))
             {
-                spawnPoint = hit.point;
+                spawnPoint = potentialValidPoint;
                 break;
             }
 
@@ -59,6 +60,29 @@ public class ScrapSpawner : MonoBehaviour
 
         //Generate a random rotation
         scrap.rotation = Quaternion.Euler(Random.Range(0, 360), Random.Range(0, 360), Random.Range(0, 360));
+    }
+
+    bool checkAboveSpawnPoint(Vector3 spawnPoint, out Vector3 validPositionChange)
+    {
+        validPositionChange = Vector3.zero;
+        // Cast a ray downwards and if it hits the ground, spawn the scrap there, otherwise generate another point
+
+        Ray ray = new Ray(spawnPoint + new Vector3(0, 100, 0), Vector3.down);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            Debug.Log("We hit something!!!!" + hit.collider.tag + " / " + hit.collider.gameObject.name);
+            if (hit.collider.CompareTag("Ground"))
+            {
+                validPositionChange = hit.point;
+                return true;
+            }
+
+            return false;
+        }
+
+        return false;
     }
 
 }

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Interactable
   - Bunker
+  - Ground
   layers:
   - Default
   - TransparentFX
