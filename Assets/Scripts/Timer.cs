@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,7 +22,9 @@ public class Timer : MonoBehaviour
 
         if (timeLeft <= 0)
         {
-            Debug.Log("Game Over");
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            SceneManager.LoadScene("Upgrade");
         }
     }
 

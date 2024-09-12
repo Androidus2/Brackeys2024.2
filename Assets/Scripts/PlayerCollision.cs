@@ -25,6 +25,14 @@ public class PlayerCollision : MonoBehaviour
         timeSinceLastCollision += Time.deltaTime;
     }
 
+    public void RemoveTime(float time)
+    {
+        if (timer != null)
+        {
+            timer.RemoveTime(time);
+        }
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (timeSinceLastCollision < graceTimeAfterCollision)
@@ -34,7 +42,7 @@ public class PlayerCollision : MonoBehaviour
 
         Debug.Log("Player collided with " + collision.gameObject.name);
 
-        if(timer != null)
+        if (timer != null)
         {
             timer.RemoveTime(timeDeducedForCollision);
         }
