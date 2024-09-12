@@ -15,6 +15,21 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 2ee013fec7c591540b44c16f2e0e0bbf, type: 2}
     - target: {fileID: 1480059986493144597, guid: e62f10ccd5403f3468137c4ebe8242a0,
         type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1480059986493144597, guid: e62f10ccd5403f3468137c4ebe8242a0,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1480059986493144597, guid: e62f10ccd5403f3468137c4ebe8242a0,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1480059986493144597, guid: e62f10ccd5403f3468137c4ebe8242a0,
+        type: 3}
       propertyPath: m_LocalPosition.x
       value: -65.044785
       objectReference: {fileID: 0}
@@ -66,7 +81,7 @@ PrefabInstance:
     - target: {fileID: 2288367490981504175, guid: e62f10ccd5403f3468137c4ebe8242a0,
         type: 3}
       propertyPath: m_Name
-      value: Antena Variant
+      value: AntenaDummy
       objectReference: {fileID: 0}
     - target: {fileID: 2288367490981504175, guid: e62f10ccd5403f3468137c4ebe8242a0,
         type: 3}
