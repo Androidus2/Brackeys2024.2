@@ -11,6 +11,9 @@ public class PlayerCollision : MonoBehaviour
     [SerializeField]
     private float timeDeducedForCollision = 5.0f;
 
+    [SerializeField]
+    private AudioSource collisionDetected;
+
     private float timeSinceLastCollision = 0.0f;
 
     Timer timer;
@@ -27,8 +30,9 @@ public class PlayerCollision : MonoBehaviour
 
     public void RemoveTime(float time)
     {
-        if (timer != null)
+        if (timer != null && timer.GetTimeLeft() > 0)
         {
+            collisionDetected.Play();
             timer.RemoveTime(time);
         }
     }
@@ -44,7 +48,7 @@ public class PlayerCollision : MonoBehaviour
 
         if (timer != null)
         {
-            timer.RemoveTime(timeDeducedForCollision);
+            RemoveTime(timeDeducedForCollision);
         }
 
         timeSinceLastCollision = 0.0f;

@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField]
-    private float speed = 5.0f;
+    private float speed;
 
     [SerializeField]
     private Transform cam;
@@ -35,6 +34,8 @@ public class PlayerMovement : MonoBehaviour
         //Lock the cursor to the center of the screen
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        speed = GameMaster.GetSpeedValue(GameMaster.SpeedLevel);
     }
 
     private void Update()

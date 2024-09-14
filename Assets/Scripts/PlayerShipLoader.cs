@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro.EditorUtilities;
 using UnityEngine;
 
 public class PlayerShipLoader : MonoBehaviour
@@ -47,7 +46,7 @@ public class PlayerShipLoader : MonoBehaviour
         List<Material> tmp = new List<Material>();
         healthMeshRenderer.GetMaterials(tmp);
         tmp[1] = speedMaterials[GameMaster.SpeedLevel - 1];
-        if(GameMaster.HealthLevel == 1)
+        if(GameMaster.HealthLevel <= 2)
             tmp[2] = glassMaterials[0];
         else
             tmp[2] = glassMaterials[1];
