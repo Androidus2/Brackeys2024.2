@@ -24,15 +24,43 @@ public class UpgradeManager : MonoBehaviour
             return;
         clickSound.Play();
         played = true;
-        StartCoroutine(WaitForFade());
+        StartCoroutine(WaitForFade(false));
     }
 
-    IEnumerator WaitForFade()
+    public void PlayTestRun()
+    {
+        if(played)
+            return;
+        played = true;
+        StartCoroutine(WaitForFade(false));
+    }
+
+    public void SkipTutorial()
+    {
+        if (played)
+            return;
+        played = true;
+        GameMaster.CompletedTutorial = true;
+        StopAllCoroutines();
+        StartCoroutine(WaitForFade(true));
+    }
+
+    IEnumerator WaitForFade(bool skipped)
     {
         fadeMenu.gameObject.SetActive(true);
         fadeMenu.SetTrigger("Fade");
         yield return new WaitForSeconds(1f);
-        SceneManager.LoadScene("Level");
+        if (!skipped)
+        {
+            if (GameMaster.CompletedTutorial)
+                SceneManager.LoadScene("Level");
+            else
+                SceneManager.LoadScene("TestRun");
+        }
+        else
+        {
+            SceneManager.LoadScene("Upgrade");
+        }
     }
 
     IEnumerator WaitToDisableFade()

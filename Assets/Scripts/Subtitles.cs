@@ -16,6 +16,13 @@ public class Subtitles : MonoBehaviour
 
     bool isLoading = false;
 
+    int minusAmount;
+
+    private void Start()
+    {
+        minusAmount = GameMaster.TutorialStage;
+    }
+
     public void LoadSubtitle(float totalTime, Action<int> callback)
     {
         if (isLoading)
@@ -28,7 +35,7 @@ public class Subtitles : MonoBehaviour
 
     IEnumerator DisplaySubtitle(float totalTime, Action<int> callback)
     {
-        string currentSubtitle = subtitles[GameMaster.TutorialStage - 1];
+        string currentSubtitle = subtitles[GameMaster.TutorialStage - minusAmount];
 
         // Break the subtitles by the '|' character into an array of strings
         string[] splitSubtitles = currentSubtitle.Split('|');

@@ -31,6 +31,7 @@ public class EnemySpawner : MonoBehaviour
             GameObject newEnemy = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
             newEnemy.GetComponent<Cloud>().SetWalkArea(enemyWalkAreas[Random.Range(0, enemyWalkAreas.Length)]);
             newEnemy.transform.parent = transform.parent;
+            newEnemy.GetComponent<AudioSource>().volume *= GameMaster.SoundVolume;
         }
     }
 

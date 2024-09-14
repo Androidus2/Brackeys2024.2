@@ -8,9 +8,12 @@ public class MenuCamera : MonoBehaviour
     [SerializeField]
     private float rotationSpeed = 10.0f;
 
+    [SerializeField]
+    private GameObject upgradeMenu;
+
     void Update()
     {
-        if(Input.GetMouseButton(1))
+        if(Input.GetMouseButton(1) && !upgradeMenu.activeInHierarchy)
         {
             float rotationX = Input.GetAxis("Mouse X") * rotationSpeed * Mathf.Deg2Rad;
             float rotationY = -Input.GetAxis("Mouse Y") * rotationSpeed * Mathf.Deg2Rad;

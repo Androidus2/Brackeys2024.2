@@ -128,7 +128,7 @@ public class Cloud : MonoBehaviour
 
         projectileRb.AddForce(projectile.forward * projectileSpeed, ForceMode.Impulse);
 
-        Destroy(projectile.gameObject, 2f);
+        //Destroy(projectile.gameObject, 2f);
     }
 
     private Vector3 GetRandomPosition()

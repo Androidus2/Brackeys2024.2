@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using DG.Tweening;
 
 public class PlayerInteract : MonoBehaviour
 {
@@ -35,6 +36,18 @@ public class PlayerInteract : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI collectedScrapText;
 
+    [SerializeField]
+    private Subtitles subtitles;
+
+    [SerializeField]
+    private GameObject subtitleTextBox;
+
+    [SerializeField]
+    private AudioSource[] subtitleAudios;
+
+    [SerializeField]
+    private Timer timer;
+
     private int collectedScrap = 0;
 
     private int state = 0; // 0 - off, 1 - turning on, 2 - turning off, 3 - on
@@ -54,7 +67,47 @@ public class PlayerInteract : MonoBehaviour
 
         maxWeight = GameMaster.GetStorageValue(GameMaster.StorageLevel);
         weightText.text = currentWeight + " / " + maxWeight;
+
+        instructionObject.transform.localScale = Vector3.zero;
+
+        if (!GameMaster.CompletedTutorial)
+        {
+            subtitleTextBox.transform.localScale = Vector3.zero;
+            subtitleTextBox.SetActive(false);
+            StartCoroutine(WaitBeforeAdvancingSubtitles(2f));
+        }
     }
+
+
+    private void AdvanceTutorial(int dummy)
+    {
+        GameMaster.TutorialStage++;
+        subtitleTextBox.transform.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => subtitleTextBox.SetActive(false));
+        if (GameMaster.TutorialStage != 7 && GameMaster.TutorialStage != 9 && GameMaster.TutorialStage != 12)
+            StartCoroutine(WaitBeforeAdvancingSubtitles(2f));
+        else if (GameMaster.TutorialStage == 12)
+            timer.EndLevel();
+        else if (GameMaster.TutorialStage == 7 && interactiblesInRange.Count > 0)
+        {
+            instructionObject.SetActive(true);
+            instructionObject.transform.DOScale(1, 0.2f).SetEase(Ease.OutBack);
+        }
+        else if (GameMaster.TutorialStage == 9 && bunkerInRange && currentWeight > 0)
+        {
+            instructionObject.SetActive(true);
+            instructionObject.transform.DOScale(1, 0.2f).SetEase(Ease.OutBack);
+        }
+    }
+
+    IEnumerator WaitBeforeAdvancingSubtitles(float timeToWait)
+    {
+        yield return new WaitForSeconds(timeToWait);
+        subtitleTextBox.SetActive(true);
+        subtitleTextBox.transform.DOScale(1, 0.2f).SetEase(Ease.OutBack);
+        subtitleAudios[GameMaster.TutorialStage - 5].Play();
+        subtitles.LoadSubtitle(subtitleAudios[GameMaster.TutorialStage - 5].clip.length, AdvanceTutorial);
+    }
+
 
     private void Update()
     {
@@ -65,12 +118,15 @@ public class PlayerInteract : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E) && state == 0)
         {
-            if (interactiblesInRange.Count > 0 || bunkerInRange)
+            if (interactiblesInRange.Count > 0 || (bunkerInRange && currentWeight > 0))
             {
+                if(!GameMaster.CompletedTutorial && (GameMaster.TutorialStage != 7 && GameMaster.TutorialStage != 9))
+                    return;
+
                 state = 1;
 
                 if(instructionObject)
-                    instructionObject.SetActive(false);
+                    instructionObject.transform.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => instructionObject.SetActive(false));
 
                 beamDown.Play();
             }
@@ -95,8 +151,18 @@ public class PlayerInteract : MonoBehaviour
                     }
                 }
 
+                if(!GameMaster.CompletedTutorial && GameMaster.TutorialStage == 7 && currentWeight > 0)
+                {
+                    StartCoroutine(WaitBeforeAdvancingSubtitles(2f));
+                }
+
                 if (bunkerInRange)
                 {
+                    if(!GameMaster.CompletedTutorial && GameMaster.TutorialStage == 9 && currentWeight > 0)
+                    {
+                        StartCoroutine(WaitBeforeAdvancingSubtitles(2f));
+                    }
+
                     GameMaster.TotalScrap += currentWeight;
                     collectedScrap += currentWeight;
                     currentWeight = 0;
@@ -131,8 +197,11 @@ public class PlayerInteract : MonoBehaviour
                     }
                 }
 
-                if(instructionObject && ((interactiblesInRange.Count > 0 && ok) || (bunkerInRange && currentWeight > 0)))
+                if (instructionObject && ((interactiblesInRange.Count > 0 && ok) || (bunkerInRange && currentWeight > 0)))
+                {
                     instructionObject.SetActive(true);
+                    instructionObject.transform.DOScale(1, 0.2f).SetEase(Ease.OutBack);
+                }
 
                 weightText.text = currentWeight + " / " + maxWeight;
             }
@@ -226,7 +295,11 @@ public class PlayerInteract : MonoBehaviour
 
             if (instructionObject && (interactiblesInRange.Count > 0 || (bunkerInRange && currentWeight > 0)) && state == 0)
             {
-                instructionObject.SetActive(true);
+                if (GameMaster.CompletedTutorial || GameMaster.TutorialStage == 7)
+                {
+                    instructionObject.SetActive(true);
+                    instructionObject.transform.DOScale(1, 0.2f).SetEase(Ease.OutBack);
+                }
             }
         }
         else if (other.CompareTag("Bunker"))
@@ -234,7 +307,11 @@ public class PlayerInteract : MonoBehaviour
             bunkerInRange = true;
             if (instructionObject && (interactiblesInRange.Count > 0 || (bunkerInRange && currentWeight > 0)) && state == 0)
             {
-                instructionObject.SetActive(true);
+                if (GameMaster.CompletedTutorial || GameMaster.TutorialStage == 9)
+                {
+                    instructionObject.SetActive(true);
+                    instructionObject.transform.DOScale(1, 0.2f).SetEase(Ease.OutBack);
+                }
             }
         }
     }
@@ -256,7 +333,7 @@ public class PlayerInteract : MonoBehaviour
 
             if (instructionObject && interactiblesInRange.Count == 0 && !bunkerInRange)
             {
-                instructionObject.SetActive(false);
+                instructionObject.transform.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => instructionObject.SetActive(false));
             }
         }
         else if (other.CompareTag("Bunker"))
@@ -264,7 +341,7 @@ public class PlayerInteract : MonoBehaviour
             bunkerInRange = false;
             if (instructionObject && interactiblesInRange.Count == 0 && !bunkerInRange)
             {
-                instructionObject.SetActive(false);
+                instructionObject.transform.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => instructionObject.SetActive(false));
             }
         }
     }

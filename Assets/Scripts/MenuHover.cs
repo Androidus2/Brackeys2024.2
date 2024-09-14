@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using DG.Tweening;
+using UnityEngine.UI;
 
 public class MenuHover : MonoBehaviour
 {
@@ -70,11 +72,75 @@ public class MenuHover : MonoBehaviour
     [SerializeField]
     private GameObject subtitleTextBox;
 
+    [SerializeField]
+    private UpgradeManager testRunStarter;
+
+    [SerializeField]
+    private GameObject instructionTextBox;
+
+    [SerializeField]
+    private GameObject skipText;
+
+    [SerializeField]
+    private Camera cam;
+
+    [SerializeField]
+    private LayerMask shipMask;
+
+    [SerializeField]
+    private Slider volumeSlider;
+
+    List<AudioSource> audios;
+    List<float> originalVolumes;
+
     void Start()
     {
         SetUp();
         if (!GameMaster.CompletedTutorial)
             DoTutorial();
+        else
+        {
+            subtitleTextBox.SetActive(false);
+            skipText.SetActive(false);
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P) && !GameMaster.CompletedTutorial)
+        {
+            testRunStarter.SkipTutorial();
+        }
+        CheckIfMouseIsOverShip();
+        if (Input.GetMouseButtonUp(0) && outline.enabled)
+            OnMouseDownCustom();
+    }
+
+    void CheckIfMouseIsOverShip()
+    {
+        RaycastHit hit;
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, shipMask))
+        {
+            if (hit.collider.gameObject == gameObject)
+            {
+                if (!upgradeMenu.activeSelf && (GameMaster.CompletedTutorial || GameMaster.TutorialStage == 4) && !outline.enabled)
+                {
+                    outline.enabled = true;
+                    Cursor.SetCursor(hoverCursorTexture, Vector2.zero, CursorMode.Auto);
+                }
+            }
+            else if(outline.enabled)
+            {
+                outline.enabled = false;
+                Cursor.SetCursor(defaultCursorTexture, Vector2.zero, CursorMode.Auto);
+            }
+        }
+        else if(outline.enabled)
+        {
+            outline.enabled = false;
+            Cursor.SetCursor(defaultCursorTexture, Vector2.zero, CursorMode.Auto);
+        }
     }
 
     private void SetUp()
@@ -83,6 +149,22 @@ public class MenuHover : MonoBehaviour
         outline.enabled = false;
 
         Cursor.SetCursor(defaultCursorTexture, Vector2.zero, CursorMode.Auto);
+
+        audios = new List<AudioSource>();
+        originalVolumes = new List<float>();
+        AudioSource[] tmpAudios = FindObjectsOfType<AudioSource>();
+        foreach (AudioSource audio in tmpAudios)
+        {
+            audios.Add(audio);
+            originalVolumes.Add(audio.volume);
+            audio.volume *= GameMaster.SoundVolume;
+        }
+
+        volumeSlider.value = GameMaster.SoundVolume;
+
+        Debug.Log("Found " + audios.Count + " audio sources.");
+
+        upgradeMenu.transform.localScale = Vector3.zero;
 
         currentHealthText.text = "" + GameMaster.GetHealthValue(GameMaster.HealthLevel);
         currentRadarText.text = "" + GameMaster.GetRadarValue(GameMaster.RadarLevel);
@@ -144,12 +226,24 @@ public class MenuHover : MonoBehaviour
         totalScrapText.text = "" + GameMaster.TotalScrap;
     }
 
+    public void ChangeVolume()
+    {
+        float value = volumeSlider.value;
+        GameMaster.SoundVolume = value;
+        for (int i = 0; i < audios.Count; i++)
+        {
+            audios[i].volume = originalVolumes[i] * value;
+        }
+    }
+
     private void DoTutorial()
     {
-        settingsButton.SetActive(false);
+        //settingsButton.transform.parent.gameObject.SetActive(false);
         playButton.SetActive(false);
         totalScrapText.transform.parent.gameObject.SetActive(false);
+        totalScrapText.transform.parent.localScale = Vector3.zero;
         subtitleTextBox.SetActive(false);
+        subtitleTextBox.transform.DOScale(0, 0.2f).SetEase(Ease.OutBack);
 
         StartCoroutine(WaitBeforeAdvancingSubtitles(2f));
     }
@@ -157,48 +251,80 @@ public class MenuHover : MonoBehaviour
     private void AdvanceTutorial(int dummy)
     {
         GameMaster.TutorialStage++;
-        subtitleTextBox.SetActive(false);
-        StartCoroutine(WaitBeforeAdvancingSubtitles(2f));
+        subtitleTextBox.transform.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => subtitleTextBox.SetActive(false));
+        if(GameMaster.TutorialStage == 3)
+            skipText.transform.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => skipText.SetActive(false));
+        if(GameMaster.TutorialStage <= 3)
+            StartCoroutine(WaitBeforeAdvancingSubtitles(2f));
+        if (GameMaster.TutorialStage == 5)
+        {
+            upgradeMenu.transform.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => upgradeMenu.SetActive(false));
+            totalScrapText.transform.parent.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => totalScrapText.transform.parent.gameObject.SetActive(false));
+            testRunStarter.PlayTestRun();
+        }
+        if(GameMaster.TutorialStage == 4)
+        {
+            instructionTextBox.transform.localScale = Vector3.zero;
+            instructionTextBox.SetActive(true);
+            instructionTextBox.transform.DOScale(1, 0.2f).SetEase(Ease.OutBack);
+        }
     }
 
     IEnumerator WaitBeforeAdvancingSubtitles(float timeToWait)
     {
         yield return new WaitForSeconds(timeToWait);
-        subtitleTextBox.SetActive(true);
-        subtitleAudios[GameMaster.TutorialStage - 1].Play();
-        subtitles.LoadSubtitle(subtitleAudios[GameMaster.TutorialStage - 1].clip.length, AdvanceTutorial);
+        if (!GameMaster.CompletedTutorial)
+        {
+            subtitleTextBox.SetActive(true);
+            subtitleTextBox.transform.DOScale(1, 0.2f).SetEase(Ease.OutBack);
+            subtitleAudios[GameMaster.TutorialStage - 1].Play();
+            subtitles.LoadSubtitle(subtitleAudios[GameMaster.TutorialStage - 1].clip.length, AdvanceTutorial);
+        }
     }
 
     private void EnableUpgradePanel()
     {
-        playButton.SetActive(false);
-        settingsButton.SetActive(false);
+        if(GameMaster.TutorialStage == 4 && !GameMaster.CompletedTutorial)
+        {
+            instructionTextBox.transform.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => instructionTextBox.SetActive(false));
+            totalScrapText.transform.parent.gameObject.SetActive(true);
+            totalScrapText.transform.parent.DOScale(1, 0.2f).SetEase(Ease.OutBack);
+            StartCoroutine(WaitBeforeAdvancingSubtitles(2f));
+        }
+        if (GameMaster.CompletedTutorial)
+        {
+            playButton.transform.parent.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => playButton.SetActive(false));
+        }
+        settingsButton.transform.parent.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => settingsButton.transform.parent.gameObject.SetActive(false));
         upgradeMenu.SetActive(true);
+        upgradeMenu.transform.DOScale(1, 0.2f).SetEase(Ease.OutBack);
         outline.enabled = false;
         Cursor.SetCursor(defaultCursorTexture, Vector2.zero, CursorMode.Auto);
     }
 
     public void DisableUpgradePanel()
     {
-        if(!upgradeMenu.activeSelf)
+        if(!upgradeMenu.activeSelf || !GameMaster.CompletedTutorial)
             return;
-        upgradeMenu.SetActive(false);
+        upgradeMenu.transform.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => upgradeMenu.SetActive(false));
         playButton.SetActive(true);
-        settingsButton.SetActive(true);
+        settingsButton.transform.parent.gameObject.SetActive(true);
+        playButton.transform.parent.DOScale(1, 0.2f).SetEase(Ease.OutBack);
+        settingsButton.transform.parent.DOScale(1, 0.2f).SetEase(Ease.OutBack);
     }
 
-    void OnMouseDown()
+    void OnMouseDownCustom()
     {
-        if (!upgradeMenu.activeSelf)
+        if (!upgradeMenu.activeSelf && (GameMaster.CompletedTutorial || GameMaster.TutorialStage == 4))
         {
             clickSound.Play();
             EnableUpgradePanel();
         }
     }
 
-    void OnMouseEnter()
+    /*void OnMouseEnter()
     {
-        if(upgradeMenu.activeSelf)
+        if(upgradeMenu.activeSelf || !(GameMaster.CompletedTutorial || GameMaster.TutorialStage == 4))
             return;
         outline.enabled = true;
         Cursor.SetCursor(hoverCursorTexture, Vector2.zero, CursorMode.Auto);
@@ -208,7 +334,7 @@ public class MenuHover : MonoBehaviour
     {
         outline.enabled = false;
         Cursor.SetCursor(defaultCursorTexture, Vector2.zero, CursorMode.Auto);
-    }
+    }*/
 
     public void UpgradeHealth()
     {

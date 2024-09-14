@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,6 +40,8 @@ public class GameMaster : MonoBehaviour
     private static bool completedTutorial = false;
     private static int tutorialStage = 1;
 
+    private static float soundVolume = 0.7f;
+
     private static GameMaster instance;
     public static GameMaster Instance
     {
@@ -55,12 +58,14 @@ public class GameMaster : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(gameObject);
 
-            totalScrap = 1000;
+            totalScrap = 0;
 
             healthLevel = 1;
             speedLevel = 1;
             radarLevel = 1;
             storageLevel = 1;
+
+            DOTween.Init();
 
             SceneManager.LoadScene("Upgrade");
         }
@@ -211,6 +216,18 @@ public class GameMaster : MonoBehaviour
         set
         {
             tutorialStage = value;
+        }
+    }
+
+    public static float SoundVolume
+    {
+        get
+        {
+            return soundVolume;
+        }
+        set
+        {
+            soundVolume = value;
         }
     }
 }
