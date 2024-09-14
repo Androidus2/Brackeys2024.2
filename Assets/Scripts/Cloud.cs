@@ -167,4 +167,9 @@ public class Cloud : MonoBehaviour
         }
     }
 
+    public void SetWalkArea(BoxCollider area)
+    {
+        walkArea = area;
+    }
+
 }

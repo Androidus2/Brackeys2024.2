@@ -17,8 +17,7 @@ public class PlayerInteract : MonoBehaviour
     [SerializeField]
     private float onBeamTime = 1.0f;
 
-    [SerializeField]
-    private int maxWeight = 10;
+    private int maxWeight;
     private int currentWeight = 0;
 
     [SerializeField]
@@ -32,6 +31,11 @@ public class PlayerInteract : MonoBehaviour
 
     [SerializeField]
     private AudioSource beamUp;
+
+    [SerializeField]
+    private TextMeshProUGUI collectedScrapText;
+
+    private int collectedScrap = 0;
 
     private int state = 0; // 0 - off, 1 - turning on, 2 - turning off, 3 - on
     private List<Interactable> interactiblesInRange = new List<Interactable>();
@@ -47,6 +51,9 @@ public class PlayerInteract : MonoBehaviour
     {
         nameID = Shader.PropertyToID("_Progress");
         beam.SetFloat(nameID, progress);
+
+        maxWeight = GameMaster.GetStorageValue(GameMaster.StorageLevel);
+        weightText.text = currentWeight + " / " + maxWeight;
     }
 
     private void Update()
@@ -91,8 +98,10 @@ public class PlayerInteract : MonoBehaviour
                 if (bunkerInRange)
                 {
                     GameMaster.TotalScrap += currentWeight;
+                    collectedScrap += currentWeight;
                     currentWeight = 0;
                     weightText.text = currentWeight + " / " + maxWeight;
+                    collectedScrapText.text = "" + collectedScrap;
                     ReleaseDummies();
                 }
 

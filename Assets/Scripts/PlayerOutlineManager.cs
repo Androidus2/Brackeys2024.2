@@ -5,6 +5,18 @@ using UnityEngine;
 public class PlayerOutlineManager : MonoBehaviour
 {
 
+    SphereCollider sphereCollider;
+
+    private void Start()
+    {
+        sphereCollider = GetComponent<SphereCollider>();
+
+        if (sphereCollider == null)
+            Debug.LogError("SphereCollider not found on PlayerOutlineManager");
+        else
+            sphereCollider.radius = GameMaster.GetRadarValue(GameMaster.RadarLevel);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Interactable"))
