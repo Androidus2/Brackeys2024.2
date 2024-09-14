@@ -34,6 +34,9 @@ public class PlayerInteract : MonoBehaviour
     private AudioSource beamUp;
 
     [SerializeField]
+    private AudioSource noStorage;
+
+    [SerializeField]
     private TextMeshProUGUI collectedScrapText;
 
     [SerializeField]
@@ -59,6 +62,8 @@ public class PlayerInteract : MonoBehaviour
     private int nameID;
     private float progress = 0;
     private float onTimer = 0;
+
+    private List<Interactable> allInteractiblesInRange = new List<Interactable>();
 
     private void Start()
     {
@@ -123,12 +128,21 @@ public class PlayerInteract : MonoBehaviour
                 if(!GameMaster.CompletedTutorial && (GameMaster.TutorialStage != 7 && GameMaster.TutorialStage != 9))
                     return;
 
+                if(!GameMaster.CompletedTutorial && GameMaster.TutorialStage == 7 && interactiblesInRange.Count == 0)
+                    return;
+
+                Debug.Log("Stage: " + GameMaster.TutorialStage);
+
                 state = 1;
 
                 if(instructionObject)
                     instructionObject.transform.DOScale(0, 0.2f).SetEase(Ease.InBack).OnComplete(() => instructionObject.SetActive(false));
 
                 beamDown.Play();
+            }
+            else if(GameMaster.CompletedTutorial && interactiblesInRange.Count == 0 && allInteractiblesInRange.Count > 0)
+            {
+                noStorage.Play();
             }
         }
         else if (state == 1)
@@ -226,9 +240,14 @@ public class PlayerInteract : MonoBehaviour
         {
             interactiblesInRange.Remove(interact);
         }
+        if(interact && allInteractiblesInRange.Contains(interact))
+        {
+            allInteractiblesInRange.Remove(interact);
+        }
 
         // If there are nulls in the list, remove them
         interactiblesInRange.RemoveAll(item => item == null);
+        allInteractiblesInRange.RemoveAll(item => item == null);
     }
 
     private void MakeDummyObject(Transform obj, Vector3 originalSize)
@@ -286,6 +305,7 @@ public class PlayerInteract : MonoBehaviour
                     {
                         interactiblesInRange.Add(interactable);
                     }
+                    allInteractiblesInRange.Add(interactable);
                 }
             }
             else
@@ -325,6 +345,8 @@ public class PlayerInteract : MonoBehaviour
             {
                 if(interactiblesInRange.Contains(interactable))
                     interactiblesInRange.Remove(interactable);
+                if (allInteractiblesInRange.Contains(interactable))
+                    allInteractiblesInRange.Remove(interactable);
             }
             else
             {
