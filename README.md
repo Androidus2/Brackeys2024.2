@@ -23,7 +23,7 @@ The project was created by 2 people:
 ## Screenshots
 
 Cover image:
-![C A L M](https://github.com/user-attachments/assets/571481ea-bd31-42da-8981-58dccc93de59)
+![C A L M 2](https://github.com/user-attachments/assets/5450dcf5-ab84-47f8-ab7c-802ff0e46ee1)
 
 Upgrade scene:
 ![Screenshot1](https://github.com/user-attachments/assets/558e9c24-ed4a-47bf-9cec-cf61d1c12ac6)
